@@ -199,12 +199,19 @@ var LineChart = (function() {
             !self.noKnobs || self.scatter) {
           var that = self;
           that.hoverBoxWidth = null;
+          var circleRadius = null;
+          if (self.scatter &&
+              self.allData.length > self.dataPointsThreshold) {
+            circleRadius = 2;
+          } else {
+            circleRadius = that.knobRadius;
+          }
           data.forEach(function(dat, idx) {
             // Knob
             that.graph.append('svg:circle')
               .attr('cx', that.xScale(dat[0]))
               .attr('cy', that.yScale(dat[1]))
-              .attr('r', that.knobRadius)
+              .attr('r', circleRadius)
               .style({'fill': self.lineColor(index),});
             // Hover area
             that.graph.append('svg:circle')
