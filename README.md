@@ -54,12 +54,7 @@ Here is a sample invocation with all available options:
           threshold: 50,          // Max. data points threshold
                                   //   (default: `50')
           tooltip: {              // Custom tooltip style rules
-            'background-color': '#FF0000',
-            'color': '#0000FF',
-            'box-shadow': '0 0 0 #000000',
-            'border': 'none',
-            'font-size': '2.2em',
-            'margin-top': '-30px',
+            'stoke': '#FF0000',
         }
 
 
@@ -94,9 +89,6 @@ When hovering over a knob, a tooltip displaying the x and y value of the
 current data point is shown. The tooltip can be styled using the `tooltip`
 option. User-defined tooltip styles have precedence over built-in ones.
 
-Do not fiddle with the `visibility` of the tooltip. If you do, unimaginable
-things will happen. Also, your tooltip will be broken.
-
 **Zooming**
 
 SkyLine comes with built-in zooming/panning support. The `zoom` options
@@ -123,9 +115,7 @@ Apart from the explicite tooltip styling, you can use the usual styling
 classes that D3.js exposes for its auto-generated elements (e.g.
 `.tick text`). SkyLine does not obstruct them. The elements are plain-old
 SVG elements generated using D3.js. So you can select tham using D3.js's
-`select` and `selectAll` and act on them like they were your own graph. The
-tooltip is a `div` that is appended to the `body` of the document and
-absolutely positioned.
+`select` and `selectAll` and act on them like they were your own graph.
 
 ## Scatter Plots
 

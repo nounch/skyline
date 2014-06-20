@@ -119,19 +119,10 @@ var SkyLine = (function() {
     });
 
     // Tooltip
-    self.tooltip = d3.select('body').append('div')
+    self.tooltip = self.svg.append('svg:text')
       .style({
-        'top': 0,
-        'left': 0,
-        'background-color': '#121212',
-        'color': '#F1F1F1',
-        'opacity': '0.8',
-        'position': 'absolute',
+        'font-size': '12pt',
         'font-family': 'Helvetica',
-        'padding': '5px',
-        'border-radius': '5px',
-        'visibility': 'hidden',
-        'z-index': '99999',
       });
     // Include user-defined style rules with heigher precedence.
     self.tooltipStyle = options['tooltip'];
@@ -259,13 +250,9 @@ var SkyLine = (function() {
                   .attr('r', self.knobRadius * 3);
                 self.tooltip
                   .text(dat[0] + ' | ' + dat[1])
-                  .style({
-                    'top': d3.event.pageY - 50,
-                    'left': d3.event.pageX,
-                    'visibility': 'visible',
-                    'border': '3px solid ' + self.lineColor(index),
-                    'box-shadow': '0 0 13px ' + self.lineColor(index),
-                  });
+                  .attr('x', d3.mouse(this)[0])
+                  .attr('y', d3.mouse(this)[1] - 25)
+                  .style({'visibility': 'visible'});
                 // Include user-defined style rules with heigher
                 // precedence.
                 self.tooltip.style(self.tooltipStyle);

@@ -61,8 +61,8 @@ var margin = 50;
 
 var lineChart = new SkyLine('#line-chart', {
   data: data,
-  width: window.innerWidth - margin,
-  height: window.innerHeight - margin,
+  width: 900,
+  height: 400,
   knobs: true,
   zoom: false,
   scatter: false,
