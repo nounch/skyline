@@ -1,3 +1,6 @@
+// SkyLine - D3.js-based, zoomable multi-line plotting component
+
+
 var SkyLine = (function() {
   // Options:
   //

@@ -1,3 +1,6 @@
+// This is simple D3.js-based bar chart.
+
+
 var BarChart = (function() {
   function BarChart(data, width, height) {
     var self = this;
