@@ -1,5 +1,5 @@
 var LineChart = (function() {
-  function LineChart(data, width, height, noKnobs) {
+  function LineChart(data, width, height, noKnobs, noZoom) {
     var self = this;
     if (Object.prototype.toString.call(data[0]) == '[object Array]') {
       self.dataSet = data;
@@ -20,6 +20,7 @@ var LineChart = (function() {
     self.knobRadius = 5;
     self.dataPointsThreshold = 50;
     self.noKnobs = noKnobs || false;
+    self.previousCursor = null;
     // x axis
     self.xScale = d3.scale.linear()
       .domain([self.minX, self.maxX])
@@ -42,23 +43,23 @@ var LineChart = (function() {
       .scale(self.xScale)
       .tickSize(5, 1)
       .ticks(10);
-    self.svg.append('svg:g')
+    self.xAxisElement = self.svg.append('svg:g')
       .attr('class', 'line-chart-x-axis')
       .attr('transform', 'translate(0, ' + (self.height - self.margin) +
             ')')
       .call(self.xAxis);
-    d3.selectAll('.line-chart-x-axis line').style({'stroke': '#121212'});
+    self.xAxisElement.selectAll('line').style({'stroke': '#121212'});
     // y axis
     self.yAxis = d3.svg.axis()
       .orient('left')
       .scale(self.yScale)
       .tickSize(5, 1)
       .ticks(10);
-    self.svg.append('svg:g')
+    self.yAxisElement = self.svg.append('svg:g')
       .attr('class', 'line-chart-y-axis')
       .attr('transform', 'translate(' + self.margin + ', 0)')
       .call(self.yAxis);
-    d3.selectAll('.line-chart-y-axis line').style({'stroke': '#121212'});
+    self.yAxisElement.selectAll('line').style({'stroke': '#121212'});
 
     // x grid
     self.xGrid = d3.svg.axis()
@@ -119,6 +120,11 @@ var LineChart = (function() {
       .domain([0, self.dataSet.length])
       .range(['steelblue', 'orange'])
       .interpolate(d3.interpolateHsl);
+
+    self.noZoom = noZoom || false;
+    if (!self.noZoom) {
+      self.enableZoom();
+    }
   }
 
   LineChart.prototype = new (function() {
@@ -162,6 +168,10 @@ var LineChart = (function() {
             'stroke-width': self.lineStrokeWidth,
           })
           .on('mouseover', function() {
+            // Set the cursor
+            self.previousCursor = self.svg.style('cursor');
+            self.svg.style({'cursor': 'default'});
+
             self.moveToForeground(this);
             d3.select(this)
               .transition()
@@ -169,6 +179,9 @@ var LineChart = (function() {
               .style({'stroke-width': self.lineStrokeWidth * 2,});
           })
           .on('mouseleave', function() {
+            // Reset the cursor
+            self.svg.style({'cursor': self.previousCursor});
+
             d3.select(this)
               .transition()
               .duration(250)
@@ -197,7 +210,10 @@ var LineChart = (function() {
                 'opacity': '0.0',
               })
               .on('mouseenter', function() {
-                d3.select('body').style({'cursor': 'crosshair'});
+                // Set the cursor
+                self.previousCursor = self.svg.style('cursor');
+                self.svg.style({'cursor': 'crosshair'});
+
                 d3.select(this)
                   .style({
                     'opacity': '0.3',
@@ -216,7 +232,9 @@ var LineChart = (function() {
                   });
               })
               .on('mouseleave', function() {
-                d3.select('body').style({'cursor': 'auto'});
+                // Reset the cursor
+                self.svg.style({'cursor': self.previousCursor});
+
                 d3.select(this)
                   .style({
                     'opacity': '0.0',
@@ -234,60 +252,69 @@ var LineChart = (function() {
     this.moveToForeground = function(element) {
       element.parentNode.appendChild(element);
     };
+
+    this.zoomed = function(self) {
+      // Do not translate if the graph is fully zoomed out (else the graph
+      // could be moved off the viewport and become invisible).
+      if (d3.event.scale > 1) {
+        self.graph
+        // .transition()
+        // .duration(130)
+          .attr('transform', 'translate(' + d3.event.translate +
+                ')scale(' + d3.event.scale + ')');
+      } else {
+        self.graph
+          .transition()
+          .duration(130)
+          .attr('transform', 'scale(' + d3.event.scale + ')');
+      }
+
+      // Recenter when fully zoomed out
+      if (d3.event.scale == 1) {
+        self.zoom.translate([0, 0]).scale(1);
+      }
+
+      // Rescale the x/y axis
+      self.xAxisElement
+        .transition()
+        .duration(130)
+        .call(self.xAxis);
+      self.yAxisElement
+        .transition()
+        .duration(130)
+        .call(self.yAxis);
+    };
+
+    this.enableZoom = function() {
+      var self = this;
+      // Zoom
+      self.svg.style({'cursor': 'ns-resize'});
+      self.zoom = d3.behavior.zoom()
+        .x(self.xScale)
+        .y(self.yScale)
+        .scaleExtent([1, 100])
+        .on('zoom', function() {
+          // Set the cursor
+          self.previousCursor = self.svg.style('cursor');
+          self.svg.style({'cursor': 'move'});
+
+          self.zoomed(self);
+        })
+        .on('zoomend', function() {
+          // Reset the cursor
+          self.svg.style({'cursor': 'ns-resize'});
+        }
+           );
+      self.svg.call(self.zoom);
+    };
+
+    this.disableZoom = function() {
+      var self = this;
+      self.svg.style({'cursor': 'auto'});
+      self.svg.on('mousewheel.zoom', null);
+      self.svg.on('wheel.zoom', null);
+    };
   })();
 
   return LineChart;
 })();
-
-// var data = [
-//   10, 2, 34, 14, 37, 20, 39, 55, 2, 22, 13, 29, 2, 302, 33, 51, 52,
-//   5, 10, 2, 34, 14, 37, 20, 39, 55, 2, 22, 13, 29, 2, 302, 33, 51, 52,
-//   10, 2, 34, 14, 37, 20, 39, 55, 2, 22, 13, 29, 2, 302, 33, 51, 52,
-//   5, 10, 2, 34, 14, 37, 20, 39, 55, 2, 22, 13, 29, 2, 302, 33, 51, 52,
-// ];
-
-var data = [
-  [
-    [1, 3],
-    [2, 4],
-    [3, 22],
-    [4, 12],
-    [5, 80],
-    [6, 43],
-  ],
-  [
-    [0, 2],
-    [1, 22],
-    [2, 4],
-    [5, 44],
-    [10.8, 3],
-    [15, 25.3],
-    [20, 55],
-  ],
-  [
-    [1, 15],
-    [2, 4],
-    [10, 3],
-    [11, 3],
-    [20, 55],
-  ],
-  [
-    [1, 15],
-    [22, 44],
-    [51, 3],
-    [63, 33],
-    [83, 5],
-  ],
-  [
-    [1, 15],
-    [3, 14],
-    [11, 43],
-    [34, 33],
-    [43, 35],
-  ],
-  [
-    [-11, 43],
-    [40, -33],
-    [53, 35],
-  ],
-];
