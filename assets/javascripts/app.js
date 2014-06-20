@@ -1,12 +1,5 @@
 // Data
 
-// var data = [
-//   10, 2, 34, 14, 37, 20, 39, 55, 2, 22, 13, 29, 2, 302, 33, 51, 52,
-//   5, 10, 2, 34, 14, 37, 20, 39, 55, 2, 22, 13, 29, 2, 302, 33, 51, 52,
-//   10, 2, 34, 14, 37, 20, 39, 55, 2, 22, 13, 29, 2, 302, 33, 51, 52,
-//   5, 10, 2, 34, 14, 37, 20, 39, 55, 2, 22, 13, 29, 2, 302, 33, 51, 52,
-// ];
-
 var data = [
   [
     [1, 3],
@@ -66,9 +59,29 @@ var data = [
 
 var margin = 50;
 
-var lineChart = new LineChart(data, window.innerWidth - margin,
-                              window.innerHeight - margin,
-                              false, true, false);
+var lineChart = new LineChart({
+  data: data,
+  width: window.innerWidth - margin,
+  height: window.innerHeight - margin,
+  knobs: true,
+  zoom: false,
+  scatter: false,
+
+  // Non-essentials
+
+  // knobRadius: 10,
+
+  // threshold: 3,
+
+  // tooltip: {
+  //   'background-color': '#FF0000',
+  //   'color': '#0000FF',
+  //   'box-shadow': '0 0 0 #000',
+  //   'border': 'none',
+  //   'font-size': '2.2em',
+  //   'margin-top': '-30px',
+  // }
+});
 
 var doZoom = true;
 document.getElementById('zoom-toggle').onclick = function() {
@@ -80,13 +93,5 @@ document.getElementById('zoom-toggle').onclick = function() {
     doZoom = true;
   }
 };
-
-// for (var i = 0; i < 10; i++) {
-//   var lineChart = new LineChart(data, window.innerWidth - margin - i * 10,
-//                                 window.innerHeight - margin - i * 10,
-//                              // false, function() { return doZoom; });
-//                              false, true);
-//   lineChart.plot();
-// }
 
 lineChart.plot();

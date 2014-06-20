@@ -1,10 +1,25 @@
 var LineChart = (function() {
-  function LineChart(data, width, height, noKnobs, noZoom, scatter) {
+  // Options:
+  //
+  //  Essentials:
+  //   - `data'
+  //   - `width'
+  //   - `height'
+  //   - `knobs'
+  //   - `zoom'
+  //   - `scatter'
+  //
+  //  Customization
+  //   - `knobRadius'
+  //   - `threshold'
+  //   - `tooltip'
+  function LineChart(options) {
     var self = this;
-    if (Object.prototype.toString.call(data[0]) == '[object Array]') {
-      self.dataSet = data;
+    if (Object.prototype.toString.call(options['data'][0]) ==
+        '[object Array]') {
+      self.dataSet = options['data'];
     } else {
-      self.dataSet = [data];
+      self.dataSet = [options['data']];
     }
     self.allData = [];
     for (var i = 0; i < self.dataSet.length; i++) {
@@ -14,12 +29,12 @@ var LineChart = (function() {
     self.maxX = d3.max(self.allData, function(d, i) { return d[0]; });
     self.minY = d3.min(self.allData, function(d, i) { return d[1]; });
     self.maxY = d3.max(self.allData, function(d, i) { return d[1]; });
-    self.width = width || 800;
-    self.height = height || 300;
+    self.width = options['width'] || 800;
+    self.height = options['height'] || 300;
     self.margin = 50;
-    self.knobRadius = 5;
-    self.dataPointsThreshold = 50;
-    self.noKnobs = noKnobs || false;
+    self.knobRadius = options['knobRadius'] || 5;
+    self.dataPointsThreshold = options['threshold'] || 50;
+    self.noKnobs = !options['knobs'] || false;
     self.previousCursor = null;
     // x axis
     self.xScale = d3.scale.linear()
@@ -114,6 +129,9 @@ var LineChart = (function() {
         'visibility': 'hidden',
         'z-index': '99999',
       });
+    // Include user-defined style rules with heigher precedence.
+    self.tooltipStyle = options['tooltip'];
+    self.tooltip.style(self.tooltipStyle);
 
     // Line color
     self.lineColor = d3.scale.sqrt()
@@ -121,13 +139,13 @@ var LineChart = (function() {
       .range(['steelblue', 'orange'])
       .interpolate(d3.interpolateHsl);
 
-    self.noZoom = noZoom || false;
+    self.noZoom = !options['zoom'] || false;
     if (!self.noZoom) {
       self.enableZoom();
     }
 
     // Scatter plot
-    self.scatter = scatter || false;
+    self.scatter = options['scatter'] || false;
   }
 
   LineChart.prototype = new (function() {
@@ -171,6 +189,7 @@ var LineChart = (function() {
               'stroke': self.lineColor(index),
               'stroke-width': self.lineStrokeWidth,
               'stroke-linejoin': 'round',
+              'stroke-linecap': 'round',
             })
             .on('mouseover', function() {
               // Set the cursor
@@ -243,6 +262,9 @@ var LineChart = (function() {
                     'border': '3px solid ' + self.lineColor(index),
                     'box-shadow': '0 0 13px ' + self.lineColor(index),
                   });
+		// Include user-defined style rules with heigher
+		// precedence.
+		self.tooltip.style(self.tooltipStyle);
               })
               .on('mouseleave', function() {
                 // Reset the cursor
