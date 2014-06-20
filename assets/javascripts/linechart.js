@@ -166,6 +166,7 @@ var LineChart = (function() {
             'fill': 'none',
             'stroke': self.lineColor(index),
             'stroke-width': self.lineStrokeWidth,
+            'stroke-linejoin': 'round',
           })
           .on('mouseover', function() {
             // Set the cursor
