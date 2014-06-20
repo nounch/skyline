@@ -1,4 +1,4 @@
-var LineChart = (function() {
+var SkyLine = (function() {
   // Options:
   //
   //  Essentials:
@@ -13,7 +13,7 @@ var LineChart = (function() {
   //   - `knobRadius'
   //   - `threshold'
   //   - `tooltip'
-  function LineChart(options) {
+  function SkyLine(selector, options) {
     var self = this;
     if (Object.prototype.toString.call(options['data'][0]) ==
         '[object Array]') {
@@ -45,7 +45,7 @@ var LineChart = (function() {
       .domain([self.minY, self.maxY])
       .range([self.height - self.margin, self.margin]);
     // Plot
-    self.svg = d3.select('body').insert('svg:svg', ':first-child')
+    self.svg = d3.select(selector).insert('svg:svg', ':first-child')
       .attr('width', self.width)
       .attr('height', self.height)
       .style({
@@ -148,7 +148,7 @@ var LineChart = (function() {
     self.scatter = options['scatter'] || false;
   }
 
-  LineChart.prototype = new (function() {
+  SkyLine.prototype = new (function() {
     this.plot = function() {
       var self = this;
 
@@ -262,9 +262,9 @@ var LineChart = (function() {
                     'border': '3px solid ' + self.lineColor(index),
                     'box-shadow': '0 0 13px ' + self.lineColor(index),
                   });
-		// Include user-defined style rules with heigher
-		// precedence.
-		self.tooltip.style(self.tooltipStyle);
+                // Include user-defined style rules with heigher
+                // precedence.
+                self.tooltip.style(self.tooltipStyle);
               })
               .on('mouseleave', function() {
                 // Reset the cursor
@@ -351,5 +351,5 @@ var LineChart = (function() {
     };
   })();
 
-  return LineChart;
+  return SkyLine;
 })();

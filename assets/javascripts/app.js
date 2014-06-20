@@ -50,7 +50,7 @@ var data = [
 // Use case: single plot
 //=========================================================================
 
-// var lineChart = new LineChart(data, 1200, 500);
+// var lineChart = new SkyLine(data, 1200, 500);
 
 
 //=========================================================================
@@ -59,7 +59,7 @@ var data = [
 
 var margin = 50;
 
-var lineChart = new LineChart({
+var lineChart = new SkyLine('#line-chart', {
   data: data,
   width: window.innerWidth - margin,
   height: window.innerHeight - margin,
