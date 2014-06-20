@@ -68,7 +68,7 @@ var margin = 50;
 
 var lineChart = new LineChart(data, window.innerWidth - margin,
                               window.innerHeight - margin,
-                              false, true);
+                              false, true, false);
 
 var doZoom = true;
 document.getElementById('zoom-toggle').onclick = function() {

@@ -1,5 +1,5 @@
 var LineChart = (function() {
-  function LineChart(data, width, height, noKnobs, noZoom) {
+  function LineChart(data, width, height, noKnobs, noZoom, scatter) {
     var self = this;
     if (Object.prototype.toString.call(data[0]) == '[object Array]') {
       self.dataSet = data;
@@ -125,6 +125,9 @@ var LineChart = (function() {
     if (!self.noZoom) {
       self.enableZoom();
     }
+
+    // Scatter plot
+    self.scatter = scatter || false;
   }
 
   LineChart.prototype = new (function() {
@@ -152,46 +155,48 @@ var LineChart = (function() {
 
       self.lineStrokeWidth = self.knobRadius / 2
       self.dataSet.forEach(function(data, index) {
-        // Line
-        self.line = d3.svg.line()
-          .x(function(d, i) { return self.xScale(d[0]); })
-          .y(function(d, i) { return self.yScale(d[1]) ; });
-        self.path = self.graph.append('svg:path');
-        if (self.allData.length > self.dataPointsThreshold) {
-          self.lineStrokeWidth = 1;
+        if (!self.scatter) {
+          // Line
+          self.line = d3.svg.line()
+            .x(function(d, i) { return self.xScale(d[0]); })
+            .y(function(d, i) { return self.yScale(d[1]) ; });
+          self.path = self.graph.append('svg:path');
+          if (self.allData.length > self.dataPointsThreshold) {
+            self.lineStrokeWidth = 1;
+          }
+          self.path
+            .attr('d', self.line(data))
+            .style({
+              'fill': 'none',
+              'stroke': self.lineColor(index),
+              'stroke-width': self.lineStrokeWidth,
+              'stroke-linejoin': 'round',
+            })
+            .on('mouseover', function() {
+              // Set the cursor
+              self.previousCursor = self.svg.style('cursor');
+              self.svg.style({'cursor': 'default'});
+
+              self.moveToForeground(this);
+              d3.select(this)
+                .transition()
+                .duration(250)
+                .style({'stroke-width': self.lineStrokeWidth * 2,});
+            })
+            .on('mouseleave', function() {
+              // Reset the cursor
+              self.svg.style({'cursor': self.previousCursor});
+
+              d3.select(this)
+                .transition()
+                .duration(250)
+                .style({'stroke-width': self.lineStrokeWidth,});
+            });
         }
-        self.path
-          .attr('d', self.line(data))
-          .style({
-            'fill': 'none',
-            'stroke': self.lineColor(index),
-            'stroke-width': self.lineStrokeWidth,
-            'stroke-linejoin': 'round',
-          })
-          .on('mouseover', function() {
-            // Set the cursor
-            self.previousCursor = self.svg.style('cursor');
-            self.svg.style({'cursor': 'default'});
-
-            self.moveToForeground(this);
-            d3.select(this)
-              .transition()
-              .duration(250)
-              .style({'stroke-width': self.lineStrokeWidth * 2,});
-          })
-          .on('mouseleave', function() {
-            // Reset the cursor
-            self.svg.style({'cursor': self.previousCursor});
-
-            d3.select(this)
-              .transition()
-              .duration(250)
-              .style({'stroke-width': self.lineStrokeWidth,});
-          });
         this.dataPointIdPrefix = 'line-chart-data-point-'
         // Knobs/Hover area
         if (self.allData.length < self.dataPointsThreshold &&
-            !self.noKnobs) {
+            !self.noKnobs || self.scatter) {
           var that = self;
           that.hoverBoxWidth = null;
           data.forEach(function(dat, idx) {
