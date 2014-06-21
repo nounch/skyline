@@ -55,7 +55,10 @@ Here is a sample invocation with all available options:
                                   //   (default: `50')
           tooltip: {              // Custom tooltip style rules
             'stoke': '#FF0000',
-        }
+            }
+          prepend: true,          // Whether to prepend to the element or not
+                                  //   (default: `false', i.e. append)
+          }
 
 
 ## The data

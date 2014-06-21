@@ -63,8 +63,8 @@ var lineChart = new SkyLine('#line-chart', {
   data: data,
   width: 900,
   height: 400,
-  knobs: true,
-  zoom: false,
+  // knobs: true,
+  zoom: true,
   scatter: false,
 
   // Non-essentials
@@ -81,6 +81,8 @@ var lineChart = new SkyLine('#line-chart', {
   //   'font-size': '2.2em',
   //   'margin-top': '-30px',
   // }
+
+  // prepend: true,
 });
 
 var doZoom = true;

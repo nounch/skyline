@@ -1,5 +1,5 @@
 // SkyLine - D3.js-based, zoomable multi-line plotting component
-// v0.1.0
+// v0.1.2
 
 
 var SkyLine = (function() {
@@ -38,7 +38,8 @@ var SkyLine = (function() {
     self.margin = 50;
     self.knobRadius = options['knobRadius'] || 5;
     self.dataPointsThreshold = options['threshold'] || 50;
-    self.noKnobs = !options['knobs'] || false;
+    self.useKnobs = options['knobs'] || true;
+    options['knobs'] == false ? self.useKnobs = false : null;
     self.previousCursor = null;
     // x axis
     self.xScale = d3.scale.linear()
@@ -49,7 +50,15 @@ var SkyLine = (function() {
       .domain([self.minY, self.maxY])
       .range([self.height - self.margin, self.margin]);
     // Plot
-    self.svg = d3.select(selector).insert('svg:svg', ':first-child')
+    self.prepend = options['prepend'] || false;
+    if (self.prepend) {
+      // Prepend to the element.
+      self.svg = d3.select(selector).insert('svg:svg', ':first-child')
+    } else {
+      // Append to the element.
+      self.svg = d3.select(selector).append('svg:svg');
+    }
+    self.svg
       .attr('width', self.width)
       .attr('height', self.height);
     self.graph = self.svg.append('svg:g');
@@ -206,8 +215,8 @@ var SkyLine = (function() {
         }
         this.dataPointIdPrefix = 'line-chart-data-point-'
         // Knobs/Hover area
-        if (self.allData.length < self.dataPointsThreshold &&
-            !self.noKnobs || self.scatter) {
+        if ((self.allData.length < self.dataPointsThreshold &&
+             self.useKnobs) || self.scatter) {
           var that = self;
           that.hoverBoxWidth = null;
           var circleRadius = null;
