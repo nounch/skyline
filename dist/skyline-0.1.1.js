@@ -51,10 +51,7 @@ var SkyLine = (function() {
     // Plot
     self.svg = d3.select(selector).insert('svg:svg', ':first-child')
       .attr('width', self.width)
-      .attr('height', self.height)
-      .style({
-        'background-color': '#F1F1F1',
-      });
+      .attr('height', self.height);
     self.graph = self.svg.append('svg:g');
     // x axis
     self.xAxis = d3.svg.axis()
